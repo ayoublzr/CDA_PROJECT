@@ -1,13 +1,61 @@
 const express = require('express')
 const route = express.Router()
 const db = require ('../models')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 
-route.post('/api/createuser',(req, res, next) => {
+route.post('/api/register',(req, res, next) => {
 
-    db.User.create(req.body)
-    .then((response) =>res.status(200).send(response) )
-    .catch((err)=>res.status(400).send(err))
+    db.User.count({where:{email:req.body.email}}).then((doc)=>{
+        if(doc!=0){
+           res.status(400).send("this email is already used") 
+
+        }else{
+            bcrypt.hash(req.body.password, 10).then(hashedPassword=>{
+                db.User.create({
+                    username: req.body.username,
+                    email: req.body.email,
+                    phone:req.body.phone,
+                    password:hashedPassword
+                })
+                .then((response) =>res.status(200).send(response) )
+                .catch((err)=>res.status(400).send(err))
+            })
+        }
+    })
+
+
+
+  
+
+})
+ 
+
+const PrivateKey ="my private key kjgnjghf:nlgnjlmjngmntghkb"
+route.post('/api/login',(req, res, next) => {
+
+   db.User.findOne({where:{email:req.body.email}}).then((user)=>{
+    if(!user){
+        res.status(400).json({error: 'email or password not valid'})
+    }else{
+        bcrypt.compare(req.body.password,user.password).then(same =>{
+           if(same){
+            let token=jwt.sign({id:user.id,username:user.username},PrivateKey,{
+                expiresIn: "24h"
+            })
+            res.status(200).json({token:token})
+           } else{
+            res.status(400).json({error: 'email or password not valid'})
+           }
+        })
+    }
+   })
+    
+
+
+
+  
 
 })
 
