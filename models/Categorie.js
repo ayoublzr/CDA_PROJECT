@@ -10,7 +10,7 @@ module.exports=(sequelize,Datatype)=>{
       
   })
   Categorie.associate=models=>{
-    Categorie.belongsTo(models.Product,{onDelete:"cascade"})
+    Categorie.hasMany(models.Product,{onDelete:"cascade"})
   
       
   }
