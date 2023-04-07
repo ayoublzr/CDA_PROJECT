@@ -33,7 +33,7 @@ if (validation.error){
                         email: email,
                         phone:phone,
                         password:hashedPassword,
-                        repeatPassword:hashedPassword
+                        
                     })
                     .then((response) =>resolve(response) )
                     .catch((err)=>reject(err))

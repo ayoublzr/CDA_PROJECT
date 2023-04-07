@@ -16,10 +16,7 @@ module.exports=(sequelize,Datatype)=>{
             type:Datatype.STRING,
             allowNull:false
           },
-          repeatPassword:{
-            type:Datatype.STRING,
-            allowNull:false
-          }
+          
 
     }) 
     return User
