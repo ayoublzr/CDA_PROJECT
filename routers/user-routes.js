@@ -12,9 +12,6 @@ route.post('/api/register',(req, res, next) => {
     .then(response => res.status(200).json(response))
     .catch(err=>res.status(400).json(err))
 
-
-  
-
 })
  
 
@@ -47,7 +44,7 @@ route.get('/api/user/:id',(req, res, next) => {
       res.status(500).json({ message: 'Internal server error' });
     });
 });
-  
+
 
 
 route.get('/api/users',(req, res, next)=>{

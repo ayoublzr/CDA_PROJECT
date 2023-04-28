@@ -1,29 +1,23 @@
-
-
-
-
-
-
 module.exports = (sequelize, Datatype) => {
-  const Product = sequelize.define('Product', {
+  const Product = sequelize.define("Product", {
     name: {
       type: Datatype.STRING,
-      allowNull: false
+      allowNull: false,
     },
     description: {
       type: Datatype.STRING,
-      allowNull: false
+      allowNull: false,
     },
     image: {
-      type: Datatype.BLOB,
-      allowNull: false
+      type: Datatype.STRING,
+      allowNull: false,
     },
     video: {
-      type: Datatype.BLOB
-    }
+      type: Datatype.BLOB,
+    },
   });
 
-  Product.associate = models => {
+  Product.associate = (models) => {
     Product.belongsTo(models.Categorie);
     Product.belongsToMany(models.Devis, { through: models.devisProduct });
   };
