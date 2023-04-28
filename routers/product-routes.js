@@ -1,23 +1,29 @@
 const express = require('express')
 const route = express.Router()
 const db = require ('../models')
+const multer = require ('multer')
 
 
 
-route.post('/api/addproduct',(req, res, next) => {
-
-    db.Product.create({
-        name: req.body.name,
-        description: req.body.description,
-        image: req.body.image,
-        video: req.body.video,
-        CategorieId:req.body.CategorieId
-
+route.post('/api/addproduct', multer({
+  storage: multer.diskStorage({
+    destination: function(req, file, cb) {
+      cb(null, 'assets/uploads')
+    },
+    filename: function(req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname)
+    }
+  })
+}).single('image'), (req, res, next) => {
+  db.Product.create({
+      name: req.body.name,
+      description: req.body.description,
+      image: req.file.filename, // Utilisation de req.file.filename pour enregistrer le nom du fichier enregistré
+      video: req.body.video,
+      CategorieId: req.body.CategorieId
     })
-    
-    .then((response) =>res.status(200).send(response) )
-    .catch((err)=>res.status(400).send(err))
-
+    .then((response) => res.status(200).send(response))
+    .catch((err) => res.status(400).send(err))
 })
 
 
