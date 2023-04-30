@@ -5,6 +5,7 @@ const db = require("./models");
 const userRoutes = require("./routers/user-routes");
 const productRoutes = require("./routers/product-routes");
 const categorieRoutes = require("./routers/categorie-routes");
+require('dotenv').config();
 
 app.use("/assets", express.static("assets"));
 app.use(express.urlencoded({ extended: true }));
@@ -22,5 +23,5 @@ app.use((req, res, next) => {
 });
 
 db.sequelize.sync().then(() => {
-  app.listen(3000, () => console.log("listening on port 3000"));
+  app.listen(process.env.PORT || 3000, () => console.log("listening on port 3000"));
 });
