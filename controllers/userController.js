@@ -2,6 +2,7 @@ const Joi =require("joi");
 const db = require ('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+require('dotenv').config();
 
 const schemaValidation =Joi.object({
     username: Joi.string().required(),
@@ -48,7 +49,7 @@ if (validation.error){
 }
 
 
-const PrivateKey ="my private key kjgnjghf:nlgnjlmjngmntghkb"
+const privateKey = process.env.PRIVATE_KEY
 
 exports.login=(email,password)=>{
     return new Promise((resolve, reject) =>{
@@ -58,7 +59,7 @@ exports.login=(email,password)=>{
             }else{
                 bcrypt.compare(password,user.password).then(same =>{
                    if(same){
-                    let token=jwt.sign({id:user.id,username:user.username},PrivateKey,{
+                    let token=jwt.sign({id:user.id,username:user.username},privateKey,{
                         expiresIn: "24h"
                     })
                     resolve(token)
