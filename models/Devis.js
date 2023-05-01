@@ -1,14 +1,14 @@
 module.exports=(sequelize,Datatype)=>{
     const Devis=sequelize.define("Devis",{
-          firstname:{
+          categorie:{
             type:Datatype.STRING,
             allowNull:false
           },
-          lastname:{
+          product:{
             type:Datatype.STRING,
             allowNull:false
           },
-          phone:{
+          surface:{
             type:Datatype.INTEGER,
             allowNull:false
           },
@@ -18,7 +18,7 @@ module.exports=(sequelize,Datatype)=>{
           }
     }) 
     Devis.associate = models => {
-      Devis.belongsToMany(models.Product, { through: models.devisProduct });
+      Devis.belongsTo(models.User);
     };
     return Devis
 }
