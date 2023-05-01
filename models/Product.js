@@ -19,7 +19,7 @@ module.exports = (sequelize, Datatype) => {
 
   Product.associate = (models) => {
     Product.belongsTo(models.Categorie);
-    Product.belongsToMany(models.Devis, { through: models.devisProduct });
+    
   };
 
   return Product;
