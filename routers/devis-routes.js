@@ -8,7 +8,7 @@ const jwtMiddleware = require('express-jwt');
 
 
 
-route.post('/api/devis', jwtMiddleware({ secret: 'your-secret-key' }),(req,res,next) => {
+route.post('/api/devis', jwtMiddleware({ secret:'your-secret-key' }),(req,res,next) => {
     db.Devis.create({
         categorie: req.body.categorie,
         product: req.body.product,
