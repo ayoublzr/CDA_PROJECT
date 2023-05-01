@@ -2,6 +2,7 @@ const Joi =require("joi");
 const db = require ('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+require('dotenv').config();
 
 const schemaValidation =Joi.object({
     username: Joi.string().required(),
@@ -9,6 +10,7 @@ const schemaValidation =Joi.object({
     phone:Joi.number().required(),
     password: Joi.string().min(8).required(),
     repeatPassword: Joi.ref('password'),
+    
 })
 
 
@@ -48,25 +50,33 @@ if (validation.error){
 }
 
 
-const PrivateKey ="my private key kjgnjghf:nlgnjlmjngmntghkb"
+const privateKey = process.env.PRIVATE_KEY;
 
-exports.login=(email,password)=>{
-    return new Promise((resolve, reject) =>{
-        db.User.findOne({where:{email:email}}).then((user)=>{
-            if(!user){
-                reject('email or password not valid')
-            }else{
-                bcrypt.compare(password,user.password).then(same =>{
-                   if(same){
-                    let token=jwt.sign({id:user.id,username:user.username},PrivateKey,{
-                        expiresIn: "24h"
-                    })
-                    resolve(token)
-                   } else{
-                    reject( 'email or password not valid')
-                   }
-                })
-            }
-           })
-    })
-}
+exports.login = (email, password) => {
+  return new Promise((resolve, reject) => {
+    db.User.findOne({ where: { email: email } }).then((user) => {
+      if (!user) {
+        reject("email or password not valid");
+      } else {
+        bcrypt.compare(password, user.password).then((same) => {
+          if (same) {
+            let token = jwt.sign(
+              { id: user.id, username: user.username },
+              privateKey,
+              {
+                expiresIn: "24h",
+              }
+            );
+
+            // Update the token in the database
+            user.update({ token: token }).then(() => {
+              resolve(token);
+            });
+          } else {
+            reject("email or password not valid");
+          }
+        });
+      }
+    });
+  });
+};

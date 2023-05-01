@@ -1,3 +1,4 @@
+
 const express=require('express')
 const cors = require('cors');
 const app =express()
@@ -6,10 +7,16 @@ const userRoutes=require('./routers/user-routes')
 const productRoutes = require('./routers/product-routes')
 const categorieRoutes = require('./routers/categorie-routes')
 const devisRoutes = require('./routers/devis-routes')
+require('dotenv').config();
 
-app.use(express.urlencoded({ extended:true }))
-app.use(express.json())
+
+
+
+app.use("/assets", express.static("assets"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cors());
+
 app.use('/',userRoutes)
 app.use('/',productRoutes)
 app.use('/',categorieRoutes)
@@ -22,7 +29,8 @@ app.use((req,res,next)=>{
     next()
 })
 
-db.sequelize.sync().then(()=>{
-    app.listen(3000,()=>console.log('listening on port 3000'))
-})
+db.sequelize.sync().then(() => {
+  app.listen(process.env.PORT || 3000, () => console.log("listening on port 3000"));
+});
+
 
