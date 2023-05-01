@@ -49,7 +49,7 @@ route.get('/api/products',(req, res, next)=>{
     db.Product.findAll({ include: db.Categorie })
     .then((response) =>res.status(200).send(response) )
     .catch((err)=>res.status(400).send(err))
-})
+});
 
 route.get('/api/products/categorie/:id', (req, res, next) => {
   db.Product.findAll({  
@@ -60,7 +60,7 @@ route.get('/api/products/categorie/:id', (req, res, next) => {
   })
   .then((response) => res.status(200).send(response))
   .catch((err) => res.status(400).send(err))
-})
+});
 
 route.patch('/api/updateproduct/:id',(req, res, next)=>{
     db.Product.findByPk(req.params.id)
