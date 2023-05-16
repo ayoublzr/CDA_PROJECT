@@ -22,7 +22,9 @@ module.exports=(sequelize,Datatype)=>{
             defaultValue:""
           }
           
+          
 
-    }) 
+    }
+    ) 
     return User
 }

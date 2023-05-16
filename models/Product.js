@@ -1,3 +1,6 @@
+
+
+
 module.exports = (sequelize, Datatype) => {
   const Product = sequelize.define("Product", {
     name: {
@@ -12,13 +15,15 @@ module.exports = (sequelize, Datatype) => {
       type: Datatype.STRING,
       allowNull: false,
     },
-    video: {
-      type: Datatype.BLOB,
-    },
+   
   });
 
   Product.associate = (models) => {
     Product.belongsTo(models.Categorie);
+    Product.hasMany(models.DevisDetails);
+    
+    
+  
     
   };
 
