@@ -80,3 +80,22 @@ exports.login = (email, password) => {
     });
   });
 };
+
+
+// exports.checkLoginAuth=(req, res) =>{
+//   User.findAll({
+//     attributes: ['email'],
+//     where: {
+//       token: req.query.authKey
+//     }
+//   })
+//     .then((result) => {
+//       res.json({
+//         message: result.length === 1,
+//       });
+//     })
+//     .catch((err) => {
+//       throw err;
+//     });
+// }
+

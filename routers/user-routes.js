@@ -98,7 +98,7 @@ route.delete('/api/deleteuser/:id',(req, res, next) => {
       res.status(500).json({ message: 'Internal server error' });
     });
 })
-
+// route.get('/api/checkLoginAuth/', userController.checkLoginAuth);
 
 
 module.exports = route
