@@ -18,7 +18,7 @@ module.exports=(sequelize,Datatype)=>{
           },
           token:{
             type:Datatype.STRING,
-            allowNull:false,
+            allowNull:true,
             defaultValue:""
           }
           
