@@ -20,6 +20,15 @@ module.exports=(sequelize,Datatype)=>{
             type:Datatype.STRING,
             allowNull:true,
             defaultValue:""
+          },
+          isActive:{
+            type:Datatype.BOOLEAN,
+            allowNull:false,
+            defaultValue:false
+          },
+          activationCode:{
+            type:Datatype.STRING,
+            allowNull:false
           }
           
           

@@ -4,8 +4,10 @@ const db = require ('../models')
 const jwt = require('jsonwebtoken')
 
 
-
 const userController= require('../controllers/userController')
+
+
+
 const privateKey = process.env.PRIVATE_KEY;
 const verifyUser = (req, res, next) => {
   const token = req.headers.authorization;
@@ -133,16 +135,18 @@ route.delete('/api/deleteuser/:id',(req, res, next) => {
             res.json({ message: 'User deleted successfully' });
           })
           .catch((error) => {
-            console.error(error);
+            c
             res.status(500).json({ message: 'Internal server error' });
           });
       }
     })
     .catch((error) => {
-      console.error(error);
+      
       res.status(500).json({ message: 'Internal server error' });
     });
 })
+
+route.post('/api/auth/verifyuser/:activationcode',userController.verifyUser)
 
 
 
