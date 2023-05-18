@@ -1,7 +1,8 @@
 const Joi =require("joi");
 const db = require ('../models')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { sendConfirmationEmail } = require("../nodemailer/verifyEmail");
 require('dotenv').config();
 
 const schemaValidation =Joi.object({
@@ -14,8 +15,15 @@ const schemaValidation =Joi.object({
 })
 
 
-exports.register=(username, email, phone, password, repeatPassword) => {
+exports.register=(username, email, phone, password, repeatPassword,activationCode) => {
 return new Promise((resolve, reject) => {
+  //methode pour crée une chaine de caractère aleatoire 
+  const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+let activationCode = ""
+for (let i=0 ; i<25 ; i++) {
+  activationCode += characters[Math.floor(Math.random() * characters.length)]
+}
+
 let validation= schemaValidation.validate({username, email, phone, password, repeatPassword})
 if (validation.error){
     reject(validation.error.details[0].message)
@@ -35,9 +43,13 @@ if (validation.error){
                         email: email,
                         phone:phone,
                         password:hashedPassword,
+                        activationCode:activationCode,
                         
                     })
-                    .then((response) =>resolve(response) )
+                    .then((response) => {
+                      sendConfirmationEmail(email, activationCode); // Appel à la méthode sendConfirmationEmail ici
+                      resolve(response);
+                    })
                     .catch((err)=>reject(err))
                 })
             }
@@ -47,6 +59,7 @@ if (validation.error){
 }
 
 })
+
 }
 
 
@@ -58,44 +71,68 @@ exports.login = (email, password) => {
       if (!user) {
         reject("email or password not valid");
       } else {
-        bcrypt.compare(password, user.password).then((same) => {
-          if (same) {
-            let token = jwt.sign(
-              { id: user.id, username: user.username },
-              privateKey,
-              {
-                expiresIn: "24h",
-              }
-            );
+        if (!user.isActive) {
+          reject("Veuillez activer votre compte en accédant à votre e-mail.");
+          
+        } else {
+          bcrypt.compare(password, user.password).then((same) => {
+            if (same) {
+              let token = jwt.sign(
+                { id: user.id, username: user.username },
+                privateKey,
+                {
+                  expiresIn: "24h",
+                }
+              );
 
-            // Update the token in the database
-            user.update({ token: token }).then(() => {
-              resolve(token);
-            });
-          } else {
-            reject("email or password not valid");
-          }
-        });
+              // Update the token in the database
+              user.update({ token: token }).then(() => {
+                resolve(token);
+              });
+            } else {
+              reject("email or password not valid");
+            }
+          });
+        }
       }
     });
   });
 };
+exports.verifyUser = (req, res) => {
+  console.log("Activation code:", req.params.activationcode);
+
+  db.User.findOne({ where: { activationCode: req.params.activationcode } })
+    .then(user => {
+      if (!user) {
+        console.log("User not found");
+        res.send({
+          message: "Ce code d'activation est faux"
+        });
+      } else {
+        console.log("User found:", user);
+
+        user.update({ isActive: true })
+          .then(() => {
+            console.log("Account activated");
+            res.send({
+              message: "Le compte a été activé avec succès"
+            });
+          })
+          .catch(error => {
+            console.log("Error updating user:", error);
+            res.status(500).send({
+              message: "Une erreur s'est produite lors de l'activation du compte"
+            });
+          });
+      }
+    })
+    .catch(error => {
+      console.log("Error finding user:", error);
+      res.status(500).send({
+        message: "Une erreur s'est produite lors de la vérification du code d'activation"
+      });
+    });
+};
 
 
-// exports.checkLoginAuth=(req, res) =>{
-//   User.findAll({
-//     attributes: ['email'],
-//     where: {
-//       token: req.query.authKey
-//     }
-//   })
-//     .then((result) => {
-//       res.json({
-//         message: result.length === 1,
-//       });
-//     })
-//     .catch((err) => {
-//       throw err;
-//     });
-// }
 
