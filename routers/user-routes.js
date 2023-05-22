@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 
 
 const userController= require('../controllers/userController')
+const { sendResetPasswordEmail } = require('../nodemailer/ResetPassword')
 
 
 
@@ -12,13 +13,13 @@ const privateKey = process.env.PRIVATE_KEY;
 const verifyUser = (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
-    return res.json({ message: "Token introuvable." });
+    return res.status(401).json({ message: "Token introuvable." });
   } else {
     jwt.verify(token, privateKey, (err, decoded) => {
       if (err) {
-        return res.json({ message: "Erreur d'authentification." });
+        return res.status(401).json({ message: "Erreur d'authentification." });
       } else {
-        req.token = decoded; // Ajouter le token décrypté à l'objet `req` pour une utilisation ultérieure si nécessaire
+        req.token = decoded;
         next();
       }
     });
@@ -28,18 +29,18 @@ const verifyUser = (req, res, next) => {
 
 
 route.get('/api/isAuth', verifyUser, (req, res) => {
-  const token = req.headers.authorization; // Récupérer le token depuis l'en-tête de la requête
+  const token = req.headers.authorization;
   db.User.findOne({ where: { token: token } })
     .then((user) => {
       if (user) {
-        return res.json({ status: "success" });
+        return res.status(200).json({ status: "success" });
       } else {
-        return res.json({ status: "error" });
+        return res.status(401).json({ status: "error", message: "Utilisateur introuvable." });
       }
     })
     .catch((error) => {
       console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ message: 'Erreur interne du serveur' });
     });
 });
 
@@ -146,8 +147,32 @@ route.delete('/api/deleteuser/:id',(req, res, next) => {
     });
 })
 
-route.post('/api/auth/verifyuser/:activationcode',userController.verifyUser)
+route.post('/api/auth/verifyuser/:activationcode',userController.verifyUser);
+route.post('/api/newpassword/:activationcode', (req, res) => {
+  const { password, repeatPassword } = req.body;
+  const activationcode = req.params.activationcode;
+  console.log(activationcode)
 
 
+  userController.newPassword(password, repeatPassword, activationcode)
+    .then(response => {
+      res.status(200).json(response);
+    })
+    .catch(err => {
+      res.status(400).json(err);
+    });
+});
+// route.post('/api/auth/resetpassword/:activationcode',userController.resetPassword)
+
+route.post('/api/resetpassword/',(req,res, next) => {
+  db.User.findOne({ where: { email: req.body.email } }).then((user)=>{
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      sendResetPasswordEmail(user.email , user.activationCode)
+      res.json({ message: 'Success' });
+      }
+  })
+})
 
 module.exports = route

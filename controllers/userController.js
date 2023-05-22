@@ -133,6 +133,38 @@ exports.verifyUser = (req, res) => {
       });
     });
 };
+exports.newPassword = (password, repeatPassword, activationcode) => {
+  console.log(activationcode)
+  return new Promise((resolve, reject) => {
+    db.User.findOne({ where: { activationCode: activationcode } })
+      .then(user => {
+        if (!user) {
+          reject("User not found");
+        } else {
+          if (password !== repeatPassword) {
+            reject("Passwords do not match");
+          } else {
+            bcrypt.hash(password, 10).then(hashedPassword => {
+              console.log(hashedPassword)
+              
+              db.User.update({
+                password: hashedPassword,
+              }, {
+                where: { activationCode: activationcode } 
+              })
+              
+                .then((response) => {
+                  resolve(response);
+                })
+                .catch((err) => reject(err));
+            });
+          }
+        }
+      })
+      .catch((err) => reject(err));
+  });
+};
+
 
 
 

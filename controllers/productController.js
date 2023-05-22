@@ -2,15 +2,31 @@ const db = require('../models');
 
 // Créer un produit
 exports.createProduct = (req, res, next) => {
-  db.Product.create({
-    name: req.body.name,
-    description: req.body.description,
-    image: req.file.filename,
-    video: req.body.video,
-    CategorieId: req.body.CategorieId,
-  })
-    .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(400).send(err));
+  console.log('Requête reçue. Body:', req.body);
+
+  db.Categorie.findOne({ where: { name: req.body.categorie } }) // Récupérer la catégorie par nom
+    .then((categorie) => {
+      console.log('Catégorie trouvée:', categorie);
+
+      if (!categorie) {
+        throw new Error("La catégorie n'a pas été trouvée");
+      }
+
+      return db.Product.create({
+        name: req.body.name,
+        description: req.body.description,
+        image: req.file.filename,
+        CategorieId: categorie.id,
+      });
+    })
+    .then((product) => {
+      console.log('Produit créé:', product);
+      res.status(200).send(product);
+    })
+    .catch((err) => {
+      console.error('Erreur:', err);
+      res.status(400).send(err);
+    });
 };
 
 // Récupérer un produit par son ID
