@@ -15,7 +15,7 @@ const schemaValidation =Joi.object({
 })
 
 
-exports.register=(username, email, phone, password, repeatPassword,activationCode) => {
+exports.register=(username, email, phone, password, repeatPassword) => {
 return new Promise((resolve, reject) => {
   //methode pour crée une chaine de caractère aleatoire 
   const characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
