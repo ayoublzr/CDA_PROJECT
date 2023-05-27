@@ -26,7 +26,7 @@ route.post(
 route.get('/api/product/:id', productController.getProductById);
 route.get('/api/products', productController.getAllProducts);
 route.get('/api/products/categorie/:id', productController.getProductsByCategoryId);
-route.patch('/api/updateproduct/:id', productController.updateProduct);
+route.patch('/api/updateproduct/:id', upload.single('image'),productController.updateProduct);
 route.delete('/api/deleteproduct/:id', productController.deleteProduct);
 
 module.exports = route;
