@@ -4,6 +4,7 @@ const db = require("../models");
 exports.createProduct = (req, res, next) => {
   console.log("Requête reçue. Body:", req.body);
 
+
   db.Categorie.findOne({ where: { name: req.body.categorie } }) // Récupérer la catégorie par nom
     .then((categorie) => {
       console.log("Catégorie trouvée:", categorie);
@@ -12,22 +13,27 @@ exports.createProduct = (req, res, next) => {
         throw new Error("La catégorie n'a pas été trouvée");
       }
 
-      return db.Product.create({
-        name: req.body.name,
-        description: req.body.description,
-        image: req.file.filename,
-        CategorieId: categorie.id,
-      });
+      if (req.file && req.file.filename) {
+         db.Product.create({
+          name: req.body.name,
+          description: req.body.description,
+          image: req.file.filename,
+          CategorieId: categorie.id,
+        });
+      } else {
+        throw new Error("Fichier invalide");
+      }
     })
     .then((product) => {
       console.log("Produit créé:", product);
-      res.status(200).send(product);
+      res.status(200).send("produit créer ");
     })
-    .catch((err) => {
-      console.error("Erreur:", err);
-      res.status(400).send(err);
+    .catch((error) => {
+      console.error("Erreur:", error);
+      res.status(400).send(error);
     });
 };
+
 
 // Récupérer un produit par son ID
 exports.getProductById = (req, res, next) => {
@@ -68,12 +74,14 @@ exports.getProductsByCategoryId = (req, res, next) => {
 
 // Mettre à jour un produit
 exports.updateProduct = (req, res, next) => {
+  console.log("Requête reçue. Body:", req.body);
   db.Product.findByPk(req.params.id)
     .then((product) => {
       if (!product) {
         res.status(404).json({ message: "Product not found" });
       } else {
         if (req.file && req.file.filename) {
+          // Si req.file est défini avec la propriété filename
           product
             .update({
               name: req.body.name,
@@ -89,8 +97,21 @@ exports.updateProduct = (req, res, next) => {
               res.status(500).json({ message: "Internal server error" });
             });
         } else {
-          // Gérez le cas où req.file est undefined ou n'a pas la propriété filename
-          res.status(400).json({ message: "Invalid file" });
+          // Si req.file est indéfini ou n'a pas la propriété filename
+          // Utilisez les valeurs existantes du produit sans mettre à jour l'image
+          product
+            .update({
+              name: req.body.name,
+              description: req.body.description,
+              CategorieId: req.body.CategorieId,
+            })
+            .then((updatedProduct) => {
+              res.json(updatedProduct);
+            })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).json({ message: "Internal server error" });
+            });
         }
       }
     })
