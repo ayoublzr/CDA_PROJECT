@@ -23,7 +23,7 @@ module.exports.sendConfirmationEmail = (email, activationCode) => {
         <h1>Email de Confirmation</h1>
         <h2>Bonjour</h2>
         <p>Pour activer votre compte, veuillez cliquer sur ce lien :</p>
-        <a href="http://localhost:3000/confirm/${activationCode}">Cliquer ici !</a>
+        <a href="http://localhost:3001/confirm/${activationCode}">Cliquer ici !</a>
       `
     })
     .catch((err) => console.log(err));
