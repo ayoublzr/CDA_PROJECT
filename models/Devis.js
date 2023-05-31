@@ -12,7 +12,7 @@ module.exports=(sequelize,Datatype)=>{
     }) 
     Devis.associate = models => {
       Devis.belongsTo(models.User);
-      Devis.hasMany(models.DevisDetails);
+      Devis.hasMany(models.DevisDetails, { onDelete: 'CASCADE' });
       
       
     };

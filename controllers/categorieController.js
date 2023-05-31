@@ -2,10 +2,10 @@ const db = require('../models');
 
 // Créer une catégorie
 exports.createCategorie = (req, res, next) => {
-  db.Categorie.create(req.body)
+  db.Categorie.create({ name: req.body.name }) // Utiliser req.body.name pour récupérer le nom
     .then((response) => res.status(200).send(response))
     .catch((err) => res.status(400).send(err));
-};
+}
 
 // Récupérer une catégorie par son ID
 exports.getCategorieById = (req, res, next) => {
