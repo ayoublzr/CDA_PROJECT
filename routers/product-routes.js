@@ -3,7 +3,6 @@ const route = express.Router();
 const productController = require("../controllers/productController");
 const multer = require("multer");
 
-// Configuration de Multer pour gérer les téléchargements de fichiers
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {
@@ -34,3 +33,5 @@ route.patch(
 route.delete("/api/deleteproduct/:id", productController.deleteProduct);
 
 module.exports = route;
+
+

@@ -8,9 +8,7 @@ const productRoutes = require('./routers/product-routes')
 const categorieRoutes = require('./routers/categorie-routes')
 const devisRoutes = require('./routers/devis-routes')
 require('dotenv').config();
-
-
-
+const port=process.env.PORT
 
 app.use("/assets", express.static("assets"));
 app.use(express.urlencoded({ extended: true }));
@@ -30,7 +28,10 @@ app.use((req,res,next)=>{
 })
 
 db.sequelize.sync().then(() => {
-  app.listen(process.env.PORT || 3003, () => console.log("listening "));
+  app.listen(port, () => console.log("listening "));
 });
 
 
+
+
+  

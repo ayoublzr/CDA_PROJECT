@@ -1,7 +1,7 @@
 const express = require('express')
 const route = express.Router()
 const db = require ('../models')
-const jwt = require('jsonwebtoken')
+
 
 
 const userController= require('../controllers/userController')
@@ -10,25 +10,25 @@ const { sendResetPasswordEmail } = require('../nodemailer/ResetPassword')
 
 
 const privateKey = process.env.PRIVATE_KEY;
-const verifyUser = (req, res, next) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ message: "Token introuvable." });
-  } else {
-    jwt.verify(token, privateKey, (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: "Erreur d'authentification." });
-      } else {
-        req.token = decoded;
-        next();
-      }
-    });
-  }
-};
+// const verifyUser = (req, res, next) => {
+//   const token = req.headers.authorization;
+//   if (!token) {
+//     return res.status(401).json({ message: "Token introuvable." });
+//   } else {
+//     jwt.verify(token, privateKey, (err, decoded) => {
+//       if (err) {
+//         return res.status(401).json({ message: "Erreur d'authentification." });
+//       } else {
+//         req.token = decoded;
+//         next();
+//       }
+//     });
+//   }
+// };
 
 
 
-route.get('/api/isAuth', verifyUser, (req, res) => {
+route.get('/api/isAuth', (req, res) => {
   const token = req.headers.authorization;
   db.User.findOne({ where: { token: token } })
     .then((user) => {

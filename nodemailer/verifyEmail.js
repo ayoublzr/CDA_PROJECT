@@ -1,30 +1,34 @@
-const nodemailer = require('nodemailer');
-
+const nodemailer = require("nodemailer");
+require('dotenv').config();
+const user = process.env.email;
+const pass = process.env.password;
+console.log(user);
 const transporter = nodemailer.createTransport({
-  host: 'smtp-mail.outlook.com',
+  host: "smtp-mail.outlook.com",
   port: 587,
-  secure: false, // true si votre serveur SMTP nécessite une connexion sécurisée (SSL/TLS)
+  secure: false,
   auth: {
-    user: 'ayoublzr1993@outlook.fr', // Adresse e-mail de l'expéditeur
-    pass: 'Motdepasse06' // Mot de passe de l'expéditeur
+    user: user,
+    pass: pass
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
 module.exports.sendConfirmationEmail = (email, activationCode) => {
   transporter
     .sendMail({
-      from: 'ayoublzr1993@outlook.fr',
+      from: user,
       to: email,
-      subject: 'Confirmer votre compte',
+      subject: "Confirmer votre compte",
       html: `
         <h1>Email de Confirmation</h1>
+        <div> pass : ${pass} ${user}</div>
         <h2>Bonjour</h2>
         <p>Pour activer votre compte, veuillez cliquer sur ce lien :</p>
         <a href="http://localhost:3001/confirm/${activationCode}">Cliquer ici !</a>
-      `
+      `,
     })
     .catch((err) => console.log(err));
 };

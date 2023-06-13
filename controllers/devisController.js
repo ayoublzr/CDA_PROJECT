@@ -1,29 +1,27 @@
 const db = require("../models");
 const nodemailer = require("nodemailer");
-
+const mail = process.env.email;
+const pass = process.env.password;
 exports.sendDevis = (req, res) => {
   const { UserId, token, DeviId } = req.body;
-  console.log(DeviId); // Vérifiez l'orthographe de DeviId
+  console.log(DeviId);
 
-  // Recherche de l'utilisateur
   db.User.findByPk(UserId)
     .then((user) => {
       if (user && user.token === token) {
-        // Configuration du transporteur SMTP
         const transporter = nodemailer.createTransport({
           host: "smtp-mail.outlook.com",
           port: 587,
           secure: false,
           auth: {
-            user: "ayoublzr1993@outlook.fr",
-            pass: "Motdepasse06",
+            user: mail,
+            pass: pass,
           },
           tls: {
             rejectUnauthorized: false,
           },
         });
 
-        // Exécution de la requête SQL personnalisée
         db.sequelize
           .query(
             `SELECT d.id AS DevId,d.commentaire as Commentaire, p.name AS ProductName, c.name AS CategoryName, dd.surface, dd.detail, u.username, u.email, u.phone
@@ -52,7 +50,7 @@ exports.sendDevis = (req, res) => {
               - E-mail : ${user.email}
               
               Devis :`;
-              
+
               // Ajouter les détails du devis
               let counter = 1;
               results.forEach((result) => {
@@ -62,7 +60,7 @@ exports.sendDevis = (req, res) => {
                 - Catégorie : ${result.CategoryName}
                 - Surface : ${result.surface}
                 - Description : ${result.detail}`;
-                
+
                 counter++;
               });
 
@@ -74,8 +72,8 @@ exports.sendDevis = (req, res) => {
 
               // Options de l'e-mail
               const mailOptions = {
-                from: "ayoublzr1993@outlook.fr",
-                to: "ayoublazaar@aol.com",
+                from: mail,
+                to: user.email,
                 subject: "Nouvelle demande de devis",
                 text: emailBody,
               };
@@ -89,7 +87,6 @@ exports.sendDevis = (req, res) => {
                       "Une erreur s'est produite lors de l'envoi du devis par email.",
                   });
                 } else {
-                  console.log("E-mail envoyé : " + info.response);
                   res.status(200).json({
                     message: "Le devis a été envoyé avec succès.",
                   });
@@ -117,7 +114,8 @@ exports.sendDevis = (req, res) => {
     .catch((error) => {
       console.log(error);
       res.status(500).json({
-        message: "Une erreur s'est produite lors de la recherche de l'utilisateur.",
+        message:
+          "Une erreur s'est produite lors de la recherche de l'utilisateur.",
       });
     });
 };
@@ -153,49 +151,38 @@ exports.createDevisDetails = (req, res) => {
     });
 };
 
-
 exports.getDevisList = (req, res) => {
-    db.sequelize
-      .query(
-        `SELECT d.id AS DevId, p.name AS ProductName, c.name AS CategoryName, dd.surface, dd.detail, d.commentaire as Commentaire, u.username, u.email, u.phone
-        FROM devis AS d
-        JOIN devisdetails dd ON dd.DeviId = d.id
-        JOIN products p ON p.Id = dd.ProductId
-        JOIN categories c ON c.Id = p.CategorieId
-        JOIN users u ON u.id = d.UserId
-        ORDER BY d.id`,
-        {
-          type: db.sequelize.QueryTypes.SELECT
-        }
-      )
-      .then((results) => {
-        res.status(200).json(results);
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).json({
-          message:
-            "Une erreur est survenue lors de la récupération de la liste des devis.",
-        });
-      });
-  };
+  db.sequelize
+    .query("CALL GetDevisInfos();")
 
-
-  exports.deleteDevis = (req, res) => {
-    const { id } = req.params;
-  
-    db.Devis.destroy({
-      where: {
-        id: id
-      }
+    .then((results) => {
+      console.log(results);
+      res.status(200).json(results);
     })
-      .then(() => {
-        res.status(200).json({ message: "Le devis a été supprimé avec succès." });
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(500).json({
-          message: "Une erreur est survenue lors de la suppression du devis."
-        });
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        message:
+          "Une erreur est survenue lors de la récupération de la liste des devis.",
       });
-  };
+    });
+};
+
+exports.deleteDevis = (req, res) => {
+  const { id } = req.params;
+
+  db.Devis.destroy({
+    where: {
+      id: id,
+    },
+  })
+    .then(() => {
+      res.status(200).json({ message: "Le devis a été supprimé avec succès." });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        message: "Une erreur est survenue lors de la suppression du devis.",
+      });
+    });
+};

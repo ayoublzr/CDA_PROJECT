@@ -1,16 +1,16 @@
 const db = require("../models");
 
-// Créer un produit
+
 exports.createProduct = (req, res, next) => {
-  console.log("Requête reçue. Body:", req.body);
+  console.log("Requête reçue. Body:", req.body)
 
 
   db.Categorie.findOne({ where: { name: req.body.categorie } }) // Récupérer la catégorie par nom
     .then((categorie) => {
-      console.log("Catégorie trouvée:", categorie);
+      console.log("Catégorie trouvée:", categorie)
 
       if (!categorie) {
-        throw new Error("La catégorie n'a pas été trouvée");
+        throw new Error("La catégorie n'a pas été trouvée")
       }
 
       if (req.file && req.file.filename) {
@@ -21,17 +21,15 @@ exports.createProduct = (req, res, next) => {
           CategorieId: categorie.id,
         });
       } else {
-        throw new Error("Fichier invalide");
+        throw new Error("Fichier invalide")
       }
     })
     .then((product) => {
-      console.log("Produit créé:", product);
-      res.status(200).send("produit créer ");
+      res.status(200).send("produit créer ",product)
     })
     .catch((error) => {
-      console.error("Erreur:", error);
-      res.status(400).send(error);
-    });
+      res.status(400).send(error)
+    })
 };
 
 
