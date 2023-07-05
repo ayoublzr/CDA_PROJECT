@@ -1,36 +1,41 @@
-const db = require("../models");
+const db = require("../models")
 
 
 exports.createProduct = (req, res, next) => {
-  console.log("Requête reçue. Body:", req.body)
+  console.log("Requête reçue. Body:", req.body);
 
-
-  db.Categorie.findOne({ where: { name: req.body.categorie } }) // Récupérer la catégorie par nom
+  db.Categorie.findOne({ where: { name: req.body.categorie } })
     .then((categorie) => {
-      console.log("Catégorie trouvée:", categorie)
+      console.log("Catégorie trouvée:", categorie);
 
       if (!categorie) {
-        throw new Error("La catégorie n'a pas été trouvée")
+        throw new Error("La catégorie n'a pas été trouvée");
       }
 
       if (req.file && req.file.filename) {
-         db.Product.create({
+        if (req.file.mimetype !== "image/jpeg") {
+          throw new Error("Veuillez sélectionner un fichier image au format JPG.");
+        }
+
+        return db.Product.create({
           name: req.body.name,
           description: req.body.description,
           image: req.file.filename,
           CategorieId: categorie.id,
+          video: req.body.video
         });
       } else {
-        throw new Error("Fichier invalide")
+        throw new Error("Fichier invalide");
       }
     })
     .then((product) => {
-      res.status(200).send("produit créer ",product)
+      res.status(200).send({ message: "Produit créé", product });
     })
     .catch((error) => {
-      res.status(400).send(error)
-    })
+      res.status(400).send(error);
+    });
 };
+
 
 
 // Récupérer un produit par son ID
@@ -38,23 +43,23 @@ exports.getProductById = (req, res, next) => {
   db.Product.findByPk(req.params.id, { include: db.Categorie })
     .then((product) => {
       if (!product) {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product not found" })
       } else {
-        res.json(product);
+        res.json(product)
       }
     })
     .catch((error) => {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
-    });
-};
+      console.error(error)
+      res.status(500).json({ message: "Internal server error" })
+    })
+}
 
 // Récupérer tous les produits
 exports.getAllProducts = (req, res, next) => {
   db.Product.findAll({ include: db.Categorie })
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(400).send(err));
-};
+    .catch((err) => res.status(400).send(err))
+}
 
 // Récupérer les produits par ID de catégorie
 exports.getProductsByCategoryId = (req, res, next) => {
@@ -67,16 +72,16 @@ exports.getProductsByCategoryId = (req, res, next) => {
     ],
   })
     .then((response) => res.status(200).send(response))
-    .catch((err) => res.status(400).send(err));
-};
+    .catch((err) => res.status(400).send(err))
+}
 
 // Mettre à jour un produit
 exports.updateProduct = (req, res, next) => {
-  console.log("Requête reçue. Body:", req.body);
+  console.log("Requête reçue. Body:", req.body)
   db.Product.findByPk(req.params.id)
     .then((product) => {
       if (!product) {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product not found" })
       } else {
         if (req.file && req.file.filename) {
           // Si req.file est défini avec la propriété filename
@@ -88,12 +93,12 @@ exports.updateProduct = (req, res, next) => {
               CategorieId: req.body.CategorieId,
             })
             .then((updatedProduct) => {
-              res.json(updatedProduct);
+              res.json(updatedProduct)
             })
             .catch((error) => {
-              console.error(error);
-              res.status(500).json({ message: "Internal server error" });
-            });
+              console.error(error)
+              res.status(500).json({ message: "Internal server error" })
+            })
         } else {
           // Si req.file est indéfini ou n'a pas la propriété filename
           // Utilisez les valeurs existantes du produit sans mettre à jour l'image
@@ -104,40 +109,40 @@ exports.updateProduct = (req, res, next) => {
               CategorieId: req.body.CategorieId,
             })
             .then((updatedProduct) => {
-              res.json(updatedProduct);
+              res.json(updatedProduct)
             })
             .catch((error) => {
-              console.error(error);
-              res.status(500).json({ message: "Internal server error" });
-            });
+              console.error(error)
+              res.status(500).json({ message: "Internal server error" })
+            })
         }
       }
     })
     .catch((error) => {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
-    });
-};
+      console.error(error)
+      res.status(500).json({ message: "Internal server error" })
+    })
+}
 // Supprimer un produit
 exports.deleteProduct = (req, res, next) => {
   db.Product.findByPk(req.params.id)
     .then((product) => {
       if (!product) {
-        res.status(404).json({ message: "Product not found" });
+        res.status(404).json({ message: "Product not found" })
       } else {
         product
           .destroy()
           .then(() => {
-            res.json({ message: "Product deleted successfully" });
+            res.json({ message: "Product deleted successfully" })
           })
           .catch((error) => {
-            console.error(error);
-            res.status(500).json({ message: "Internal server error" });
-          });
+            console.error(error)
+            res.status(500).json({ message: "Internal server error" })
+          })
       }
     })
     .catch((error) => {
-      console.error(error);
-      res.status(500).json({ message: "Internal server error" });
-    });
-};
+      console.error(error)
+      res.status(500).json({ message: "Internal server error" })
+    })
+}

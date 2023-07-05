@@ -1,19 +1,19 @@
 
 const express=require('express')
-const cors = require('cors');
+const cors = require('cors')
 const app =express()
 const db =require('./models')
 const userRoutes=require('./routers/user-routes')
 const productRoutes = require('./routers/product-routes')
 const categorieRoutes = require('./routers/categorie-routes')
 const devisRoutes = require('./routers/devis-routes')
-require('dotenv').config();
+require('dotenv').config()
 const port=process.env.PORT
 
-app.use("/assets", express.static("assets"));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
+app.use("/assets", express.static("assets"))
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(cors())
 
 app.use('/',userRoutes)
 app.use('/',productRoutes)
@@ -28,8 +28,8 @@ app.use((req,res,next)=>{
 })
 
 db.sequelize.sync().then(() => {
-  app.listen(port, () => console.log("listening "));
-});
+  app.listen(port, () => console.log("listening "))
+})
 
 
 

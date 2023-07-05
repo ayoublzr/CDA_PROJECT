@@ -2,8 +2,8 @@
 
 const transporter = require('./transporter')
 
-const user = process.env.email;
-console.log(user);
+const user = process.env.email
+console.log(user)
 module.exports.sendResetPasswordEmail = (email, activationCode) => {
   transporter
     .sendMail({
@@ -17,5 +17,5 @@ module.exports.sendResetPasswordEmail = (email, activationCode) => {
         <a href="http://localhost:3001/newpassword/${activationCode}">Cliquer ici !</a>
       `,
     })
-    .catch((err) => console.log(err));
-};
+    .catch((err) => console.log(err))
+}

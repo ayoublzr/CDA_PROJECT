@@ -17,6 +17,10 @@ module.exports = (sequelize, Datatype) => {
       type: Datatype.STRING,
       allowNull: false,
     },
+    video: {
+      type: Datatype.STRING,
+      allowNull: false,
+    },
   });
 
   Product.associate = (models) => {
